@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 manage.py makemigrations ads)",
+      "Bash(python3 manage.py migrate)",
+      "Bash(python3 manage.py shell -c ' *)",
+      "Bash(python3 -c \"import django; print\\(django.__version__\\)\")",
+      "Bash(python3 -m py_compile totp.py)",
+      "Bash(git init *)",
+      "Bash(git add *)"
+    ]
+  }
+}

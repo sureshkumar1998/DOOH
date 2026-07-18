@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+env/
+
+# Django
+db.sqlite3
+db.sqlite3-journal
+mediafiles/
+media/
+staticfiles/
+
+# Secrets / local config
+.env
+station_token.txt
+*.pem
+*.key
+
+# Sync cache + logs
+media_sync/cache/
+media_sync/*.log
+*.log
+django_server.log
+vite.log
+
+# Node / frontend build
+ads-dashboard/node_modules/
+ads-dashboard/dist/
+
+# Large media drop-in (served at runtime, not source)
+login_ad/*.mp4
+login_ad/*.webm
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/

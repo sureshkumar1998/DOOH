@@ -1,0 +1,36 @@
+from django.urls import path
+from .views import (
+    PlaylistView, AdSyncView, AdConfigView, TargetsView,
+    AdUploadView, AdListView, AdDetailView, BulkReorderView,
+    DeviceListView, DeviceDetailView,
+    PlaybackHeartbeatView, PlaybackLogView, PlaybackLogSummaryView,
+    ImpressionsView, LayoutView, LoginAdsView,
+    PlacementListView, PlacementDetailView,
+    MeView, ProofOfPlayReportView,
+    AdvertiserListView, AdvertiserDetailView,
+)
+
+urlpatterns = [
+    path('me/', MeView.as_view(), name='me'),
+    path('reports/proof-of-play/', ProofOfPlayReportView.as_view(), name='proof-of-play'),
+    path('playlist/', PlaylistView.as_view(), name='playlist'),
+    path('playlist/sync/', AdSyncView.as_view(), name='playlist-sync'),
+    path('playlist/config/', AdConfigView.as_view(), name='playlist-config'),
+    path('targets/', TargetsView.as_view(), name='targets'),
+    path('devices/', DeviceListView.as_view(), name='device-list'),
+    path('devices/<str:device_id>/heartbeat/', PlaybackHeartbeatView.as_view(), name='device-heartbeat'),
+    path('devices/<str:device_id>/', DeviceDetailView.as_view(), name='device-detail'),
+    path('upload/', AdUploadView.as_view(), name='upload'),
+    path('ads/', AdListView.as_view(), name='ad-list'),
+    path('ads/<int:pk>/', AdDetailView.as_view(), name='ad-detail'),
+    path('ads/reorder/', BulkReorderView.as_view(), name='ad-reorder'),
+    path('logs/', PlaybackLogView.as_view(), name='playback-logs'),
+    path('logs/summary/', PlaybackLogSummaryView.as_view(), name='playback-logs-summary'),
+    path('impressions/', ImpressionsView.as_view(), name='impressions'),
+    path('layout/', LayoutView.as_view(), name='layout'),
+    path('login-ads/', LoginAdsView.as_view(), name='login-ads'),
+    path('placements/', PlacementListView.as_view(), name='placements'),
+    path('placements/<int:pk>/', PlacementDetailView.as_view(), name='placement-detail'),
+    path('advertisers/', AdvertiserListView.as_view(), name='advertisers'),
+    path('advertisers/<int:pk>/', AdvertiserDetailView.as_view(), name='advertiser-detail'),
+]
