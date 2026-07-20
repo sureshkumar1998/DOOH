@@ -44,6 +44,93 @@ class MeView(APIView):
         return Response({'username': request.user.username, 'role': _role_of(request.user)})
 
 
+def _serialize_user(u):
+    return {
+        'id': u.id,
+        'username': u.username,
+        'role': _role_of(u),
+        'is_active': u.is_active,
+        'last_login': u.last_login.isoformat() if u.last_login else None,
+        'date_joined': u.date_joined.isoformat() if u.date_joined else None,
+    }
+
+
+class UserListView(APIView):
+    """Admin-only team management: list users, create a user with a role."""
+    permission_classes = [IsAdminRole]
+
+    def get(self, request):
+        from django.contrib.auth.models import User
+        return Response([_serialize_user(u) for u in User.objects.all().order_by('id')])
+
+    def post(self, request):
+        from django.contrib.auth.models import User
+        username = (request.data.get('username') or '').strip()
+        password = request.data.get('password') or ''
+        role = request.data.get('role', 'operator')
+        if not username:
+            return Response({'error': 'Username is required.'}, status=status.HTTP_400_BAD_REQUEST)
+        if len(password) < 6:
+            return Response({'error': 'Password must be at least 6 characters.'}, status=status.HTTP_400_BAD_REQUEST)
+        if role not in ('admin', 'operator'):
+            return Response({'error': "Role must be 'admin' or 'operator'."}, status=status.HTTP_400_BAD_REQUEST)
+        if User.objects.filter(username__iexact=username).exists():
+            return Response({'error': 'A user with this username already exists.'}, status=status.HTTP_400_BAD_REQUEST)
+        is_admin = role == 'admin'
+        user = User.objects.create_user(
+            username=username, password=password,
+            is_staff=is_admin, is_superuser=is_admin, is_active=True,
+        )
+        return Response(_serialize_user(user), status=status.HTTP_201_CREATED)
+
+
+class UserDetailView(APIView):
+    """Admin-only: delete a user, or reset their password / role."""
+    permission_classes = [IsAdminRole]
+
+    def _get(self, pk):
+        from django.contrib.auth.models import User
+        try:
+            return User.objects.get(pk=pk)
+        except User.DoesNotExist:
+            return None
+
+    def patch(self, request, pk):
+        from django.contrib.auth.models import User
+        user = self._get(pk)
+        if not user:
+            return Response({'error': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+        if 'password' in request.data:
+            pw = request.data['password'] or ''
+            if len(pw) < 6:
+                return Response({'error': 'Password must be at least 6 characters.'}, status=status.HTTP_400_BAD_REQUEST)
+            user.set_password(pw)
+        if 'role' in request.data:
+            role = request.data['role']
+            if role not in ('admin', 'operator'):
+                return Response({'error': "Role must be 'admin' or 'operator'."}, status=status.HTTP_400_BAD_REQUEST)
+            # Don't let the last admin demote themselves out of admin.
+            if role == 'operator' and user.id == request.user.id and User.objects.filter(is_superuser=True).count() <= 1:
+                return Response({'error': 'You are the only admin — create another admin first.'}, status=status.HTTP_400_BAD_REQUEST)
+            user.is_staff = user.is_superuser = (role == 'admin')
+        if 'is_active' in request.data:
+            user.is_active = bool(request.data['is_active'])
+        user.save()
+        return Response(_serialize_user(user))
+
+    def delete(self, request, pk):
+        from django.contrib.auth.models import User
+        user = self._get(pk)
+        if not user:
+            return Response({'error': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+        if user.id == request.user.id:
+            return Response({'error': 'You cannot delete your own account.'}, status=status.HTTP_400_BAD_REQUEST)
+        if _role_of(user) == 'admin' and User.objects.filter(is_superuser=True).count() <= 1:
+            return Response({'error': 'Cannot delete the last admin account.'}, status=status.HTTP_400_BAD_REQUEST)
+        user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 def _contract_status(advertiser):
     if not advertiser.contract_end:
         return 'none'

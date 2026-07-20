@@ -8,6 +8,7 @@ import OverviewPage from './pages/OverviewPage.jsx'
 import MonitorPage from './pages/MonitorPage.jsx'
 import LogsPage from './pages/LogsPage.jsx'
 import ImpressionsPage from './pages/ImpressionsPage.jsx'
+import UsersPage from './pages/UsersPage.jsx'
 import AdvertisersPage from './pages/AdvertisersPage.jsx'
 
 function PrivateRoute() {
@@ -38,6 +39,7 @@ export default function App() {
               <Route path="/videos" element={<VideosPage />} />
               <Route path="/placement" element={<PlacementPage />} />
               <Route path="/impressions" element={<ImpressionsPage />} />
+            <Route path="/users" element={<UsersPage />} />
               <Route path="/advertisers" element={<AdvertisersPage />} />
             </Route>
             <Route path="/overview" element={<OverviewPage />} />

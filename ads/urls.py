@@ -7,11 +7,14 @@ from .views import (
     ImpressionsView, LayoutView, LoginAdsView,
     PlacementListView, PlacementDetailView,
     MeView, ProofOfPlayReportView,
+    UserListView, UserDetailView,
     AdvertiserListView, AdvertiserDetailView,
 )
 
 urlpatterns = [
     path('me/', MeView.as_view(), name='me'),
+    path('users/', UserListView.as_view(), name='user-list'),
+    path('users/<int:pk>/', UserDetailView.as_view(), name='user-detail'),
     path('reports/proof-of-play/', ProofOfPlayReportView.as_view(), name='proof-of-play'),
     path('playlist/', PlaylistView.as_view(), name='playlist'),
     path('playlist/sync/', AdSyncView.as_view(), name='playlist-sync'),

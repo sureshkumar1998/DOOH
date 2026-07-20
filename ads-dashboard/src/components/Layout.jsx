@@ -93,6 +93,19 @@ const fleetItems = [
   // },
 ]
 
+const adminItems = [
+  {
+    to: '/users',
+    label: 'Users',
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+          d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-1.13a4 4 0 10-4-4 4 4 0 004 4zm6 0a4 4 0 10-3-6.63" />
+      </svg>
+    ),
+  },
+]
+
 export default function Layout() {
   const navigate = useNavigate()
   const [logoError, setLogoError] = useState(false)
@@ -105,6 +118,7 @@ export default function Layout() {
     localStorage.removeItem('access_token')
     localStorage.removeItem('refresh_token')
     localStorage.removeItem('role')
+    localStorage.removeItem('username')
     navigate('/login')
   }
 
@@ -184,6 +198,29 @@ export default function Layout() {
               {item.label}
             </NavLink>
           ))}
+
+          {role === 'admin' && (
+            <>
+              <p className="text-xs font-semibold uppercase tracking-widest px-3 mb-3 mt-6" style={{ color: '#d9a52b' }}>
+                Admin
+              </p>
+              {adminItems.map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                      isActive ? 'text-white' : 'text-white/60 hover:text-white hover:bg-white/10'
+                    }`
+                  }
+                  style={({ isActive }) => isActive ? { backgroundColor: 'rgba(217,165,43,0.25)', color: '#d9a52b' } : {}}
+                >
+                  {item.icon}
+                  {item.label}
+                </NavLink>
+              ))}
+            </>
+          )}
         </nav>
 
         {/* Logout */}

@@ -26,6 +26,7 @@ export default function Login() {
       try {
         const me = await axios.get('/api/me/', { headers: { Authorization: `Bearer ${data.access}` } })
         localStorage.setItem('role', me.data.role)
+        localStorage.setItem('username', me.data.username)
         navigate(me.data.role === 'operator' ? '/overview' : '/')
       } catch {
         localStorage.setItem('role', 'admin')
