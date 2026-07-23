@@ -839,7 +839,8 @@ class AdUploadView(APIView):
 
         media_type = detect_media_type(file_mime)
 
-        # Enforce ad panel dimensions: 8:3 aspect, at least 512x192.
+        # Enforce a minimum size (at least one panel, 512x192). Any aspect ratio is
+        # accepted — media is scaled to fill the panel.
         dims = get_media_dimensions(file)
         if not dims:
             return Response(
