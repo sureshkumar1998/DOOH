@@ -1,16 +1,14 @@
-// Ad panels in the CCU player are fixed 512x192 (8:3). Files must match that ratio
-// and be at least panel size, so they render full-bleed (no black bars / no crop).
-// Keep these numbers in sync with AD_PANEL_W / AD_PANEL_H / AD_ASPECT in ads/views.py.
+// Ad panels are 512x192 (split) / 1024x192 (full). Any aspect ratio is accepted and
+// scaled to fill the panel; we only enforce a minimum size so a tiny image doesn't
+// upscale into a blurry mess. Keep these numbers in sync with AD_PANEL_W / AD_PANEL_H
+// in ads/views.py.
 export const AD_PANEL_W = 512
 export const AD_PANEL_H = 192
-export const AD_ASPECT = 8 / 3
-export const AD_ASPECT_TOL = 0.02
-export const AD_SPEC_HINT = 'Required: 8:3 ratio, min 512×192 (e.g. 512×192 or 1024×384)'
+export const AD_SPEC_HINT = 'Any image/video, min 512×192 — it will be scaled to fill the panel.'
 
 function checkRule(width, height) {
   if (!width || !height) return 'Could not read dimensions.'
   if (width < AD_PANEL_W || height < AD_PANEL_H) return `is ${width}×${height} — minimum size is ${AD_PANEL_W}×${AD_PANEL_H}.`
-  if (Math.abs(width / height - AD_ASPECT) > AD_ASPECT_TOL) return `is ${width}×${height} — must be 8:3 aspect (e.g. ${AD_PANEL_W}×${AD_PANEL_H} or 1024×384).`
   return null
 }
 
@@ -36,7 +34,7 @@ function readVideoSize(file) {
 }
 
 // Returns { ok, width, height, error }. `error` is a phrase like
-// "is 1920×1080 — must be 8:3 aspect …" (caller prefixes the filename).
+// "is 400×150 — minimum size is 512×192." (caller prefixes the filename).
 export default async function validateDimensions(file) {
   const isVideo = file.type.startsWith('video/')
   const { width, height } = isVideo ? await readVideoSize(file) : await readImageSize(file)

@@ -242,12 +242,11 @@ MAX_UPLOAD_SIZE = 200 * 1024 * 1024  # 200 MB
 SCHEDULE_FIELDS = {'start_date', 'end_date', 'daily_start_time', 'daily_end_time'}
 VALID_SLOTS = {'top_left', 'top_right', 'bottom_left', 'bottom_right'}
 
-# Ad panels in the CCU player are fixed 512x192 (8:3). We reject off-spec uploads so
-# they render full-bleed (no black bars / no crop). Higher-res 8:3 files are allowed.
+# Ad panels are 512x192 (split) / 1024x192 (full). Any aspect ratio is accepted and
+# scaled to fill the panel (object-fit: fill) — we only enforce a minimum size so a tiny
+# image doesn't upscale into a blurry mess.
 AD_PANEL_W = 512
 AD_PANEL_H = 192
-AD_ASPECT = 8 / 3
-AD_ASPECT_TOL = 0.02
 
 
 def detect_media_type(mime):
@@ -292,11 +291,10 @@ def get_media_dimensions(django_file):
 
 
 def validate_dimensions(w, h):
-    """Return (ok, message). Requires 8:3 aspect and at least 512x192."""
+    """Return (ok, message). Any aspect ratio is fine (it's scaled to fill the panel);
+    only enforce a minimum size of 512x192 so tiny images don't upscale to mush."""
     if w < AD_PANEL_W or h < AD_PANEL_H:
         return False, f'Minimum size is {AD_PANEL_W}×{AD_PANEL_H}.'
-    if abs(w / h - AD_ASPECT) > AD_ASPECT_TOL:
-        return False, f'Must be 8:3 aspect (e.g. {AD_PANEL_W}×{AD_PANEL_H} or 1024×384).'
     return True, ''
 
 

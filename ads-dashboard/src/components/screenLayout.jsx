@@ -168,12 +168,14 @@ function Panel({ slot, assignments, adsById, interactive, onDrop, onClear, onPan
           {(() => {
             const notLive = ad.is_live === false
             const dim = notLive ? { filter: 'grayscale(1) brightness(0.5)' } : {}
+            // Stretch to fill the panel (no crop, no bars) — matches the intended
+            // on-screen fit; far-off-ratio media looks distorted, which is accepted.
             return ad.media_type === 'video' ? (
               <video src={ad.url} muted autoPlay loop playsInline
-                style={{ width: '100%', height: '100%', objectFit: 'contain', ...dim }} />
+                style={{ width: '100%', height: '100%', objectFit: 'fill', ...dim }} />
             ) : (
               <img src={ad.url} alt={ad.title}
-                style={{ width: '100%', height: '100%', objectFit: 'cover', ...dim }} />
+                style={{ width: '100%', height: '100%', objectFit: 'fill', ...dim }} />
             )
           })()}
           {ad.is_live === false && (() => {
